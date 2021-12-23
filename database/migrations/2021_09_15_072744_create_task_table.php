@@ -32,6 +32,7 @@ class CreateTaskTable extends Migration
             $table->string('status_id');
             $table->string('date');
             $table->string('time');
+            $table->table('taken_by');
             $table->timestamps();
 
             // $table->foreign('category_id')->references('id')->on('task_categories')->onDelete('cascade');

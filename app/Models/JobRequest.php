@@ -13,11 +13,18 @@ class JobRequest extends Model
 
     protected $fillable = [
         'taskID',
-        'runnerID',    
+        'runnerID',
+        'job_requests_status',    
     ];
 
     public function User()
     {
         return $this->belongsTo('App\Models\Task','id');
+    }
+
+
+    public function Runner()
+    {
+        return $this->belongsTo('App\Models\User','runnerID');
     }
 }

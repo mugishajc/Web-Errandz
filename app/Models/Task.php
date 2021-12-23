@@ -30,6 +30,7 @@ class Task extends Model
         'status_id',
         'date',
         'time',
+        'taken_by',
     ];
     public function Task_Categories()
     {

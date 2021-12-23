@@ -27,7 +27,7 @@ class LiveLocation extends Model
 
            
     ];
-    public function UserLiveLocation()
+    public function User()
     {
         return $this->belongsTo('App\Models\UserLiveLocation','user_id');
     }

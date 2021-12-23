@@ -43,6 +43,7 @@ class UserLiveLocationController extends Controller
         //
         
         $fields =  $request->validate([
+            'userID'=>'required',
             'name_address'=> 'required|string',
             'latitude'=>'required|string',
             'longitude'=>'required|string',
@@ -53,7 +54,7 @@ class UserLiveLocationController extends Controller
            ]);
 
            $live=LiveLocation::create([
-            'user_id' => Auth::user()->id,
+            'user_id' => $fields['userID'],
             'name_address' => $fields['name_address'],
             'latitude' => $fields['latitude'],
             'longitude' => $fields['longitude'],
@@ -62,7 +63,8 @@ class UserLiveLocationController extends Controller
             'status' => $fields['status'],
             
          ]);
-         return  response(['message'=>'User Recent Live Location Captured well', 'status'=>201]);
+         return response()->json(['message'=>'success'],201);
+    
     }
 
     /**

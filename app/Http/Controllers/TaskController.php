@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Task_categories;
 use App\Models\Task_status;
 use App\Models\Task;
+use App\Models\ApprovedErrandz;
+use App\Models\JobRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
-use App\Models\JobRequest;
+use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Onlinestatus;
 class TaskController extends Controller
@@ -244,17 +246,20 @@ public function saveonlinestatus(Request $request){
 
 public function apply_request(Request $request){
 
-    $validated = $request->validate([
-        'taskID' => 'required|unique:job_requests',
-        'runnerID' => 'required',
-    ]);
+   $jobid=$request->get('taskID');
+   $runid=$request->get('runnerID');
+   if(JobRequest::where('taskID','=',$jobid)->where('runnerID','=',$runid)->first()){
 
-                $usi=JobRequest::create([
+    return response(['message'=>'Already applied',200]);
+   }
+
+    $usi=JobRequest::create([
                     'taskID' =>  $request->get('taskID'),
                     'runnerID' =>$request->get('runnerID'),
+                    'job_requests_status'=>$request->get('job_requests_status'),
             
                  ]);
-     $res=[ 'message'=>'Success'];
+     $res=[ 'message'=>'applied'];
      return response()->json($res,201);  
 }
 
@@ -276,4 +281,91 @@ public function viewall_offer(Request $request){
     $re=['message'=>'ok','data'=>$U];
     return response()->json($re,201);
 }
+
+public function view_applied_runner_posts(Request $request){
+   
+ 
+    $trans=JobRequest::with(['Runner'])
+    ->where('taskID', '=',$request->get('TaskID') )
+    ->get();
+        return response()->json(['data' => $trans], 201);
+   
+}
+
+public function approve_runner_toperformjob(Request $request){
+   
+
+  JobRequest::where('taskID', '=', $request->get('taskID'))
+->update(['job_requests_status' => $request->get('status')]);
+
+Task::where('id', '=', $request->get('taskID'))
+->update(['status_id' => $request->get('status'),
+'taken_by'=>$request->get('takenBY')]);
+
+       
+ return response()->json(['message'=>'successfully approved by Errander'],201);
+}
+public function deny_runner_toperformjob(Request $request){
+    JobRequest::where( 'taskID', '=', $request->get('taskid'))
+    ->where('runnerID','=',$request->get('runnerid'))
+->update(['job_requests_status' => $request->get('status')]);
+
+return response()->json(['message'=>'successfully denied by Errander'],201);
+
+}
+
+public function viewtaskdata(Request $request){
+
+$data=Task::where('id', '=', $request->get('taskID'))->get();
+
+$response=[
+    'message:'=>'ok',
+    'data'=> $data,
+    'code' => '201'
+];
+
+    return  response($response, 201);
+}
+
+public function viewrunnerprofile(Request $request){
+   $runner_profile= User::where('id', '=', $request->get('Runner_ID'))->get();
+   return response()->json(['data'=>$runner_profile],201);
+
+}
+
+public function beginerrandz(Request $request){
+    
+    // $errandid=$request->get('taskID');
+    // $runnerid=$request->get('runnerID');
+    // $erranderID=$request->get('erranderID');
+    // if(ApprovedErrandz::where('Task_ID','=',$errandid)
+    // ->where('Runner_ID','=',$runnerid)
+    // ->where('Errander_ID','=',$erranderID)
+    // ->first()){ return response(['message'=>'Already approved this job',200]);}
+
+    $array = [
+        'Task_ID'=>$request->get('taskID'),
+        'Runner_ID'=>$request->get('runnerID'),
+        'Errander_ID'=>$request->get('erranderID'),
+        'Status'=>$request->get('status'),
+        'Runner_reply'=>$request->get('runnerReply'),
+      ];
+
+      ApprovedErrandz::updateOrCreate($array);
+
+
+
+ $ubutumwa = [
+    'Sender_ID'=>$request->get('erranderID'),
+    'Receiver_ID'=>$request->get('runnerID'),
+    'Sender_status'=>$request->get('senderstatus'),
+    'Receiver_status'=>$request->get('receiverstatus'),
+    'message'=>$request->get('ubutumwa'), ];
+    Message::updateOrCreate($ubutumwa);
+
+return response()->json(['message'=>'success'],201);
+}
+
+
+
 }

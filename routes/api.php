@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthUserController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UmufungoController;
 use App\Http\Controllers\UserLiveLocationController;
+use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\RunnerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,25 +51,64 @@ Route::post('/Errandz/Vx/View/Task/Me/Active-Errandz',[TaskController::class,'vi
 //retrieve all  my errandz
 Route::post('/Errandz/Vx/View/Task/Me/All-Errandz',[TaskController::class,'viewall_offer']);
 
+
+//retrieve all  runner applied to my post
+Route::post('Errander/Vx/User/Requests/Applied-Runner-Requests',[TaskController::class,'view_applied_runner_posts']);
+
+
+
+//update user info
 Route::put('/Errandz/Modify/{id}',[AuthUserController::class,'update']);
 
 //ikofi depo
 Route::post('/Wallet/xV/User/Errandz-Ikofi/Deposit',[UmufungoController::class,'kubika_uMufunGoo']);
 
-//mywalletbal
+//mywalletbalance
 Route::post('/Wallet/xV/Me/Errandz-Ikofi/Balance',[UmufungoController::class,'Ikofi_yanjYE']);
+
+//approve applied-runner to perform an errand
+Route::post('/Runner/Vx/Post/Approve-runner',[TaskController::class,'approve_runner_toperformjob']);
+
+//deny runner request to perform job
+Route::post('/Runner/Vx/Post/Deny-runner',[TaskController::class,'deny_runner_toperformjob']);
+
+
+//View errandz info
+Route::post('/View/Task-Errander/info',[TaskController::class,'viewtaskdata']);
+
+
+//View runner info
+Route::post('/View/Runner/Profile/info',[TaskController::class,'viewrunnerprofile']);
+
+
+//begin task and initiate messaging
+Route::post('/Errandz/Task/Approved-Job-Runner/Errander-store',[TaskController::class,'beginerrandz']);
+
+//view chat
+Route::post('/Chat/View/Vx/Show-Messages',[MessagesController::class,'gusomaUbutumwa']);
+
+//view my approved jobs
+Route::post('/Runner/View/Me/Approved-Errandz',[RunnerController::class,'viewmyapproved_jobs']);
+
+//runner started errandz
+Route::post('/Runner/Approve/Me/Job-initiated',[RunnerController::class,'runnerbegun_job']);
+
+//senduserupdatelocation
+Route::post('/Errandz/User/capture/UserLiveLocation',[UserLiveLocationController::class,'store']);
+
+//runner finish errandz
+Route::post('/Runner/User/End-Job/waiting_Errander-approval',[RunnerController::class,'end_job']);
 
 
 //Protected Routes
 Route::group(['middleware' => ['auth:sanctum']],function(){
-    
+
     Route::put('/Errandz/View/{id}',[AuthUserController::class,'showuser']);
     Route::put('/Errandz/Delete/{id}',[AuthUserController::class,'destroy']);
-    Route::post('/Errandz/Logout',[AuthUserController::class,'signout']);  
+    Route::post('/Errandz/Logout',[AuthUserController::class,'signout']);
 
-    Route::post('/Errandz/ShowUserLiveLocation',[UserLiveLocationController::class,'store']);
-  
-//User roles     
+
+//User roles
 Route::post('/Errandz/Vx/Admin/Register-Role',[AuthUserController::class,'addRole']);
 Route::get('/Errandz/Vx/Admin/show-All-Roles',[AuthUserController::class,'viewRoles']);
 
@@ -81,6 +122,8 @@ Route::post('/Errandz/Vx/Admin/Add-Task-status',[TaskController::class,'addTasks
 
 //online use
 Route::post('/Errandz/send/onlineuserstatus',[TaskController::class,'saveonlinestatus']);
+
+
 
 
 });

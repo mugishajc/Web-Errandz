@@ -17,8 +17,8 @@ class CreateJobRequestsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('taskID')->nullable();
             $table->unsignedBigInteger('runnerID')->nullable();
+            $table->string('job_requests_status');
             $table->timestamps();
-
             $table->foreign('taskID')->references('id')->on('task')->onDelete('cascade');
         });
     }
